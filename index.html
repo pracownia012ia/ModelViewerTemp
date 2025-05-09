@@ -4,7 +4,7 @@
 <meta content="charset=UTF-8"/>
 <title>test - Model viewer hostowanie</title>
 <!--STYLESHEET-->
-
+<script type="module" src="https://unpkg.com/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
 <!--SPIDERGL-->
 </head>
 <body>
@@ -15,8 +15,8 @@
 <iframe src="https://tinyglb.com/viewer/3bc7a39a97fa4da1a7760227c77c6405" style="border: 0; height: 600px; width: 100%"></iframe>
 </div></td><td>
 <div>
-<p style = "text-align: center; font-size: 30px;">Szpila z Czernięcina2</p>
-<model-viewer src="SzpilaCI22159Gtif.glb" shadow-intensity="1" alt="Model szpila ze skarbu znalezionego w Częrniecine poduchownym"></model-viewer>
+<p style = "text-align: center; font-size: 30px;">Szpila z Czernięcina</p>
+<model-viewer id="reveal" loading="eager" camera-controls touch-action="pan-y" auto-rotate poster="" tone-mapping="aces" src="public/models/SzpilaCI22159Gtif.glb" shadow-intensity="1" alt="Model szpila ze skarbu znalezionego w Częrniecine poduchownym"></model-viewer>
 <!--<iframe src="https://tinyglb.com/viewer/180f1976f2954709bd3a1f01aa5cc8ae" style="border: 0; height: 600px; width: 100%"></iframe>-->
 </div></td></tr>
 </table>
