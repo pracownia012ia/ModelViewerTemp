@@ -11,6 +11,7 @@
   const select = document.querySelector('#varianty');
 
   modelViewerVariants.addEventListener('load', () => {
+	modelViewerVariants.variantName = null;
 	const names = modelViewerVariants.availableVariants;
 	for (const name of names) {
 	  const option = document.createElement('option');
