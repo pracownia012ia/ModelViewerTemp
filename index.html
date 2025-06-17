@@ -102,8 +102,7 @@
     panning = false;
   }, true);
 
-document.querySelector('#button-load').addEventListener('click',
-                    () => document.querySelector('#lazy-load').dismissPoster());
+
 </script>
 <!--SPIDERGL-->
 <style>
@@ -154,14 +153,14 @@ padding-bottom: 1%;
                     right: 0;
                     top: 0;
                     bottom: 0;
-                    background-image: url("public/prev/021Naczynie4Prev.png");
+                    background-image: url("public/Prev/021Naczynie4Prev.png");
                     background-size: contain;
                     background-repeat: no-repeat;
                     background-position: center;
                   }
 				  
 #button-load {
-                    background-image: url("public/prev/Zoom_in_font_awesome.svg");
+                    background-image: url("public/Prev/Zoom_in_font_awesome.svg");
                     background-repeat: no-repeat;
                     background-size: 24px 24px;
                     background-position: 6% 50%;
@@ -213,7 +212,7 @@ padding-bottom: 1%;
 <table style="width: 100%;">
 		<tr><th colspan="2" ><p class="tytul_zab">Naczynie Wczesnośredniowieczne - Warianty</p></th></tr>
 		<tr>
-		<td style="border: 0; height: 600px; width: 50%; margin: 0;"><model-viewer reveal="manual" loading="eager" exposure ="1" camera-controls touch-action="pan-y" auto-rotate poster="" tone-mapping="aces" src="021Naczynie4Gltf2.glb" shadow-intensity="1" alt="Naczynie wczesnośredniowieczne znajdujące się w IA UMCS" class="form_zab naczynie"><div class="controls glass">
+		<td style="border: 0; height: 600px; width: 50%; margin: 0;"><model-viewer id="lazy-load" reveal="manual" loading="eager" exposure ="1" camera-controls touch-action="pan-y" auto-rotate poster="" tone-mapping="aces" src="021Naczynie4Gltf2.glb" shadow-intensity="1" alt="Naczynie wczesnośredniowieczne znajdujące się w IA UMCS" class="form_zab naczynie"><div class="controls glass">
                     <div>Wariant: <select class="varianty"></select></div>
                   </div>
 				  <div id="lazy-load-poster" slot="poster"></div>
@@ -259,4 +258,7 @@ padding-bottom: 1%;
 </table>
 
 </body>
+<script>
+document.querySelector('#button-load').addEventListener('click',() => document.querySelector('#lazy-load').dismissPoster());
+					</script>
 </html>
