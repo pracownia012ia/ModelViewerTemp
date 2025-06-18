@@ -160,6 +160,19 @@ padding-bottom: 1%;
 					height: 100%;
 					width: 100%;
                   }
+#lazy-load-poster2 {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    top: 0;
+                    bottom: 0;
+                    background-image: url("public/Prev/MuzeumNaczyniePomorskiePrev.png");
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-position: center;
+					height: 100%;
+					width: 100%;
+                  }
 				  
 #button-load {
                     background-image: url("public/Prev/Zoom_in_font_awesome.png");
@@ -193,7 +206,7 @@ padding-bottom: 1%;
 		<model-viewer id = "lazy-load" loading="eager" exposure ="1" camera-controls touch-action="pan-y" auto-rotate poster="" tone-mapping="aces" src="public/models/NaczyniePomorskieBlend2ShaderrMiarka.glb" shadow-intensity="1" alt="Naczynie Pomorskie znajdujące się w Muzeum w Lublinie" class="form_zab naczynie"><div class="controls glass">
                     <div>Wariant: <select class="varianty"></select></div>
                   </div>
-				  <div id="lazy-load-poster" slot="poster"></div>
+				  <div id="lazy-load-poster2" slot="poster"></div>
 				  <div id="button-load" slot="poster">Pokaż model</div>
 				  </model-viewer>
 		<!-- <iframe src="https://tinyglb.com/viewer/3bc7a39a97fa4da1a7760227c77c6405" class="form_zab"></iframe> -->
