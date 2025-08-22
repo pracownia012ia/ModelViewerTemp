@@ -27,9 +27,11 @@
 	option.textContent = 'Default';
 	select.appendChild(option);
   });
-
+	
+	for (document.getElementsByClassName('.varianty').length) {
   select.addEventListener('input', (event) => {
 	modelViewerVariants.variantName = event.target.value === 'default' ? null : event.target.value;
+	}
   });
   
   const modelViewer = document.querySelector("#envlight-demo");
