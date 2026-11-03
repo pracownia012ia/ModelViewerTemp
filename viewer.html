@@ -6,15 +6,28 @@
   <title>Podgląd modelu 3D</title>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <style>
-    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: transparent; }
-    model-viewer { width: 100%; height: 100%; }
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #1e1e1e; font-family: sans-serif; }
+    model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
+    
+    #lazy-load-poster {
+      position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+      background-size: contain; background-repeat: no-repeat; background-position: center;
+    }
+    #button-load {
+      background-color: rgba(0, 0, 0, 0.8); color: white; cursor: pointer;
+      border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 12px 20px; font-weight: 600; font-size: 15px;
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      z-index: 100; text-align: center;
+    }
+    #button-load:hover { background-color: rgba(40, 40, 40, 0.95); }
   </style>
 </head>
 <body>
 
   <model-viewer 
     id="viewer" 
-	reveal="manual"
+    reveal="manual" 
     exposure="1" 
     camera-controls 
     touch-action="pan-y" 
@@ -22,21 +35,46 @@
     tone-mapping="aces" 
     shadow-intensity="1" 
     alt="Model 3D zabytku">
+    
+    <div id="lazy-load-poster" slot="poster"></div>
+    <div id="button-load" slot="poster">Załaduj model 3D</div>
+
   </model-viewer>
 
   <script>
+    // Ścieżka wskazująca bezpośrednio na folder wewnątrz Twojego repozytorium:
+    const BAZA_URL = "public/models";
+
     const params = new URLSearchParams(window.location.search);
     const plik = params.get('plik');
-    const opis = params.get('alt');
+    const plakat = params.get('poster');
     const viewer = document.getElementById('viewer');
+    const loadButton = document.getElementById('button-load');
+    const posterDiv = document.getElementById('lazy-load-poster');
 
     if (plik) {
-      // Automatycznie pobiera plik z folderu public/models/ wewnątrz ModelViewerTemp
-      viewer.src = `public/models/${plik}`;
+      viewer.src = `${BAZA_URL}/${plik}`;
+    } else {
+      loadButton.textContent = "Brak parametru ?plik=NazwaModelu.glb w adresie URL!";
+      loadButton.style.backgroundColor = "#8b0000";
     }
-    if (opis) {
-      viewer.alt = opis;
+
+    if (plakat) {
+      posterDiv.style.backgroundImage = `url('${BAZA_URL}/${plakat}')`;
     }
+
+    loadButton.addEventListener('click', () => {
+      if (!plik) return;
+      loadButton.textContent = "Ładowanie modelu...";
+      viewer.dismissPoster();
+    });
+
+    // Diagnostyka błędu (np. literówka w nazwie pliku .glb)
+    viewer.addEventListener('error', (event) => {
+      loadButton.style.display = 'block';
+      loadButton.style.backgroundColor = "#8b0000";
+      loadButton.textContent = `Błąd 404: Nie znaleziono pliku ${BAZA_URL}/${plik}`;
+    });
   </script>
 
 </body>
