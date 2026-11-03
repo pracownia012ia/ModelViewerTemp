@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Podgląd modelu 3D</title>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: transparent; }
+    model-viewer { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+
+  <model-viewer 
+    id="viewer" 
+    loading="eager" 
+    exposure="1" 
+    camera-controls 
+    touch-action="pan-y" 
+    auto-rotate 
+    tone-mapping="aces" 
+    shadow-intensity="1" 
+    alt="Model 3D zabytku">
+  </model-viewer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const plik = params.get('plik');
+    const opis = params.get('alt');
+    const viewer = document.getElementById('viewer');
+
+    if (plik) {
+      // Automatycznie pobiera plik z folderu public/models/ wewnątrz ModelViewerTemp
+      viewer.src = `public/models/${plik}`;
+    }
+    if (opis) {
+      viewer.alt = opis;
+    }
+  </script>
+
+</body>
+</html>
