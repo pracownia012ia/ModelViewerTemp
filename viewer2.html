@@ -164,7 +164,7 @@
         {
           tytul: "Naczynie pomorskie",
           plik: "NaczyniePomorskieBlend2ShaderrMiarka2.glb",
-          poster: "", // opcjonalnie np. "naczynie_miniatura.webp"
+          poster: "MuzeumNaczyniePomorskiePrev.png", // opcjonalnie np. "naczynie_miniatura.webp"
           stanowisko: "Lublin-Zemborzyce, stan. 1",
           opis: "Popielnica o baniastym brzuścu z wyodrębnioną szyjką. Kultura pomorska, wczesna epoka żelaza (ok. V–III w. p.n.e.).",
           badania: "1978 r., kier. badań dr J. Kowalski",
@@ -173,7 +173,7 @@
         },
         {
           tytul: "Zapinka podkowiasta",
-          plik: "MFZapinkPodkGlb.glb",
+          plik: "ZapinkaPodkowiastagITF.glb",
           poster: "",
           stanowisko: "Czermno, stan. 2",
           opis: "Zapinka brązowa o przekroju rombowatym z odgiętymi końcami. Okres wpływów rzymskich / wczesne średniowiecze.",
@@ -240,13 +240,13 @@
       loadButton.textContent = `Załaduj model 3D: ${zabytek.tytul}`;
 
       if (zabytek.poster) {
-        posterDiv.style.backgroundImage = `url('${BAZA_URL}/${zabytek.poster}')`;
+        posterDiv.style.backgroundImage = `url('${BAZA_URL}/Postery/${zabytek.poster}')`;
       } else {
         posterDiv.style.backgroundImage = "none";
       }
 
       // Podmiana ścieżki pliku .glb (pobierze się dopiero po kliknięciu przycisku)
-      viewer.src = `${BAZA_URL}/${zabytek.plik}`;
+      viewer.src = `${BAZA_URL}/Modele/${zabytek.plik}`;
     }
 
     // Generowanie przycisków dla wszystkich zabytków z wybranego okresu
