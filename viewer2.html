@@ -3,74 +3,283 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Podgląd modelu 3D</title>
+  <title>Katalog Zabytków 3D</title>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <style>
-    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #1e1e1e; font-family: sans-serif; }
-    model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
-    
-    /* Styl dla ekranu startowego przed kliknięciem (reveal="manual") */
+    * { box-sizing: border-box; }
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #18181b; color: #f4f4f5; overflow: hidden;
+    }
+
+    /* Główny układ: Model po lewej, Panel informacji po prawej */
+    .layout {
+      display: flex; width: 100%; height: 100%;
+    }
+
+    .viewer-section {
+      flex: 1; position: relative; height: 100%; background: radial-gradient(circle, #27272a 0%, #18181b 100%);
+    }
+
+    model-viewer {
+      width: 100%; height: 100%; --poster-color: transparent;
+    }
+
+    /* Przycisk ładowania na żądanie */
     #lazy-load-poster {
-      position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+      position: absolute; inset: 0;
       background-size: contain; background-repeat: no-repeat; background-position: center;
     }
     #button-load {
-      background-color: rgba(0, 0, 0, 0.75); color: white; cursor: pointer;
-      border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 12px 20px; font-weight: 600; font-size: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      background-color: rgba(24, 24, 27, 0.88); color: #fff; cursor: pointer;
+      border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 12px 22px; font-weight: 600; font-size: 14px;
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-      z-index: 100; transition: background 0.2s;
+      z-index: 10; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
-    #button-load:hover { background-color: rgba(30, 30, 30, 0.95); }
+    #button-load:hover { background-color: #3f3f46; border-color: #fff; }
+
+    /* Prawy panel boczny z wyborem zabytków i metryczką */
+    .sidebar {
+      width: 380px; height: 100%; background-color: #202024;
+      border-left: 1px solid #3f3f46; display: flex; flex-direction: column;
+    }
+
+    /* Lista wyboru zabytków na górze panelu */
+    .selector-header {
+      padding: 14px 16px; border-bottom: 1px solid #3f3f46; background-color: #1c1c1f;
+    }
+    .selector-title {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+      color: #a1a1aa; margin-bottom: 8px; font-weight: 600;
+    }
+    .artifact-list {
+      display: flex; flex-wrap: wrap; gap: 6px; max-height: 125px; overflow-y: auto;
+    }
+    .artifact-btn {
+      background-color: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+      padding: 6px 11px; border-radius: 6px; font-size: 12px; cursor: pointer;
+      transition: all 0.15s; text-align: left;
+    }
+    .artifact-btn:hover { background-color: #3f3f46; }
+    .artifact-btn.active {
+      background-color: #b45309; color: #fff; border-color: #d97706; font-weight: 600;
+    }
+
+    /* Sekcja informacji naukowych */
+    .info-panel {
+      padding: 18px 16px; overflow-y: auto; flex: 1;
+    }
+    .artifact-main-title {
+      margin: 0 0 16px 0; font-size: 18px; color: #ffffff;
+      border-bottom: 1px solid #3f3f46; padding-bottom: 10px;
+    }
+    .meta-item {
+      margin-bottom: 14px;
+    }
+    .meta-label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+      color: #fbbf24; font-weight: 600; margin-bottom: 3px;
+    }
+    .meta-value {
+      font-size: 13.5px; line-height: 1.45; color: #e4e4e7; margin: 0;
+    }
+
+    /* Responsywność na ekrany telefonów i węższe kolumny */
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .viewer-section { height: 52%; }
+      .sidebar { width: 100%; height: 48%; border-left: none; border-top: 1px solid #3f3f46; }
+    }
   </style>
 </head>
 <body>
 
-  <model-viewer 
-    id="viewer" 
-    reveal="manual" 
-    exposure="1" 
-    camera-controls 
-    touch-action="pan-y" 
-    auto-rotate 
-    tone-mapping="aces" 
-    shadow-intensity="1" 
-    alt="Model 3D zabytku">
-    
-    <!-- Plakat (miniaturka) w tle przed pobraniem modelu -->
-    <div id="lazy-load-poster" slot="poster"></div>
-    
-    <!-- Przycisk wyzwalający pobranie pliku .glb -->
-    <div id="button-load" slot="poster">Załaduj model 3D</div>
+  <div class="layout">
+    <!-- Okno 3D -->
+    <div class="viewer-section">
+      <model-viewer 
+        id="viewer" 
+        reveal="manual" 
+        exposure="1" 
+        camera-controls 
+        touch-action="pan-y" 
+        auto-rotate 
+        tone-mapping="aces" 
+        shadow-intensity="1" 
+        alt="Model 3D zabytku">
+        
+        <div id="lazy-load-poster" slot="poster"></div>
+        <div id="button-load" slot="poster">Załaduj model 3D</div>
+      </model-viewer>
+    </div>
 
-  </model-viewer>
+    <!-- Pasek boczny: lista zabytków + opis -->
+    <div class="sidebar">
+      <div class="selector-header">
+        <div class="selector-title" id="liczba-zabytkow">Wybierz zabytek z okresu:</div>
+        <div class="artifact-list" id="artifact-buttons"></div>
+      </div>
+
+      <div class="info-panel">
+        <h2 class="artifact-main-title" id="info-tytul">Nazwa zabytku</h2>
+        
+        <div class="meta-item">
+          <div class="meta-label">Stanowisko</div>
+          <p class="meta-value" id="info-stanowisko">—</p>
+        </div>
+
+        <div class="meta-item">
+          <div class="meta-label">Opis zabytku / Datowanie / Kultura</div>
+          <p class="meta-value" id="info-opis">—</p>
+        </div>
+
+        <div class="meta-item">
+          <div class="meta-label">Rok i autor badań</div>
+          <p class="meta-value" id="info-badania">—</p>
+        </div>
+
+        <div class="meta-item">
+          <div class="meta-label">Miejsce przechowywania</div>
+          <p class="meta-value" id="info-miejsce">—</p>
+        </div>
+
+        <div class="meta-item" id="sekcja-literatura">
+          <div class="meta-label">Literatura</div>
+          <p class="meta-value" id="info-literatura">—</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // 1. Wpisz tutaj swój adres z Cloudflare R2 (lub jsDelivr CDN):
+    // 1. Ścieżka do folderu z modelami (lokalna lub z Cloudflare R2):
     const BAZA_URL = "https://pub-455c0d32f5c8404082c43a9158408b16.r2.dev"; 
-    // Alternatywa dla jsDelivr (<20MB): const BAZA_URL = "https://cdn.jsdelivr.net/gh/pracownia012ia/ModelViewerTemp@main/public/models";
+    // Dla Cloudflare R2 podmień na: const BAZA_URL = "https://pub-455c0d32f5c8404082c43a9158408b16.r2.dev";
+
+    // 2. Baza zabytków podzielona na okresy (możesz dodawać dowolną liczbę obiektów):
+    const BAZA_OKRESOW = {
+      "wczesne_zelazo": [
+        {
+          tytul: "Naczynie pomorskie",
+          plik: "NaczyniePomorskieBlend2ShaderrMiarka2.glb",
+          poster: "", // opcjonalnie np. "naczynie_miniatura.webp"
+          stanowisko: "Lublin-Zemborzyce, stan. 1",
+          opis: "Popielnica o baniastym brzuścu z wyodrębnioną szyjką. Kultura pomorska, wczesna epoka żelaza (ok. V–III w. p.n.e.).",
+          badania: "1978 r., kier. badań dr J. Kowalski",
+          miejsce: "Muzeum Narodowe w Lublinie (nr inw. ML/A/123)",
+          literatura: "Kowalski J. 1982, Cmentarzysko kultury pomorskiej w Lublinie, Archeologia Polski, t. 27, s. 45–60."
+        },
+        {
+          tytul: "Zapinka podkowiasta",
+          plik: "MFZapinkPodkGlb.glb",
+          poster: "",
+          stanowisko: "Czermno, stan. 2",
+          opis: "Zapinka brązowa o przekroju rombowatym z odgiętymi końcami. Okres wpływów rzymskich / wczesne średniowiecze.",
+          badania: "2015 r., badania Instytutu Archeologii UMCS",
+          miejsce: "Instytut Archeologii UMCS w Lublinie",
+          literatura: "" // Puste pole automatycznie ukryje sekcję "Literatura" dla niepublikowanego zabytku
+        }
+      ],
+
+      "rzym": [
+        {
+          tytul: "Zapinka oczkowata",
+          plik: "MFZapinkPodkGlb.glb",
+          poster: "",
+          stanowisko: "Gródek nad Bugiem, stan. 1C",
+          opis: "Fibula brązowa serii głównej, faza B2 okresu wpływów rzymskich, kultura wielbarska.",
+          badania: "1985 r., prof. A. Kokowski",
+          miejsce: "Zbiory Instytutu Archeologii UMCS",
+          literatura: "Kokowski A. 1995, Grupa masłomęcka, Lublin."
+        }
+        // Tutaj możesz dopisać kolejne 10–15 zabytków po przecinku...
+      ]
+    };
 
     const params = new URLSearchParams(window.location.search);
-    const plik = params.get('plik');
-    const plakat = params.get('poster'); // opcjonalna miniaturka .webp / .jpg
+    const wybranyOkres = params.get('okres') || "wczesne_zelazo";
+    const listaZabytkow = BAZA_OKRESOW[wybranyOkres] || [];
+
     const viewer = document.getElementById('viewer');
     const loadButton = document.getElementById('button-load');
     const posterDiv = document.getElementById('lazy-load-poster');
+    const buttonsContainer = document.getElementById('artifact-buttons');
+    let aktualnyPlik = "";
 
-    if (plik) {
-      viewer.src = `${BAZA_URL}/${plik}`;
+    function wybierzZabytek(index) {
+      const zabytek = listaZabytkow[index];
+      if (!zabytek) return;
+
+      // Podświetlenie aktywnego przycisku
+      document.querySelectorAll('.artifact-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+      });
+
+      // Aktualizacja tekstów w karcie katalogowej
+      document.getElementById('info-tytul').textContent = zabytek.tytul;
+      document.getElementById('info-stanowisko').textContent = zabytek.stanowisko || "Brak danych";
+      document.getElementById('info-opis').textContent = zabytek.opis || "Brak danych";
+      document.getElementById('info-badania').textContent = zabytek.badania || "Brak danych";
+      document.getElementById('info-miejsce').textContent = zabytek.miejsce || "Brak danych";
+
+      // Ukrywanie pola "Literatura", jeśli zabytek nie był publikowany
+      const sekcjaLit = document.getElementById('sekcja-literatura');
+      if (zabytek.literatura && zabytek.literatura.trim() !== "") {
+        sekcjaLit.style.display = "block";
+        document.getElementById('info-literatura').textContent = zabytek.literatura;
+      } else {
+        sekcjaLit.style.display = "none";
+      }
+
+      // Reset odtwarzacza do trybu "Załaduj model 3D" przy przełączeniu zabytku
+      aktualnyPlik = zabytek.plik;
+      loadButton.style.display = "block";
+      loadButton.style.backgroundColor = "rgba(24, 24, 27, 0.88)";
+      loadButton.textContent = `Załaduj model 3D: ${zabytek.tytul}`;
+
+      if (zabytek.poster) {
+        posterDiv.style.backgroundImage = `url('${BAZA_URL}/${zabytek.poster}')`;
+      } else {
+        posterDiv.style.backgroundImage = "none";
+      }
+
+      // Podmiana ścieżki pliku .glb (pobierze się dopiero po kliknięciu przycisku)
+      viewer.src = `${BAZA_URL}/${zabytek.plik}`;
     }
 
-    // Jeśli w adresie podano miniaturkę (np. ?plik=waza.glb&poster=waza.webp), ustaw ją w tle
-    if (plakat) {
-      posterDiv.style.backgroundImage = `url('${BAZA_URL}/${plakat}')`;
+    // Generowanie przycisków dla wszystkich zabytków z wybranego okresu
+    if (listaZabytkow.length > 0) {
+      document.getElementById('liczba-zabytkow').textContent = `Zabytki w tym okresie (${listaZabytkow.length}):`;
+      listaZabytkow.forEach((zabytek, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'artifact-btn';
+        btn.textContent = `${index + 1}. ${zabytek.tytul}`;
+        btn.onclick = () => wybierzZabytek(index);
+        buttonsContainer.appendChild(btn);
+      });
+      wybierzZabytek(0); // Domyślnie pokaż pierwszy zabytek z listy
+    } else {
+      document.getElementById('info-tytul').textContent = "Nie znaleziono okresu w bazie";
+      loadButton.textContent = `Brak zdefiniowanego okresu: ?okres=${wybranyOkres}`;
     }
 
-    // Obsługa kliknięcia - rozpoczyna pobieranie modelu 3D dopiero po kliknięciu
+    // Kliknięcie przycisku "Załaduj model 3D"
     loadButton.addEventListener('click', () => {
-      loadButton.textContent = "Ładowanie modelu...";
+      if (!aktualnyPlik) return;
+      loadButton.textContent = "Trwa pobieranie modelu...";
       viewer.dismissPoster();
+    });
+
+    viewer.addEventListener('load', () => {
+      loadButton.style.display = "none";
+    });
+
+    viewer.addEventListener('error', () => {
+      loadButton.style.display = "block";
+      loadButton.style.backgroundColor = "#8b0000";
+      loadButton.textContent = `Błąd 404: Nie znaleziono pliku ${BAZA_URL}/${aktualnyPlik}`;
     });
   </script>
 
